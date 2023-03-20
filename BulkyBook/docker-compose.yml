@@ -1,0 +1,33 @@
+version: '3.4'
+
+networks:
+  bulkybookweb:
+
+services:
+  bulkybookdb:
+    container_name: bulkybookdb
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports:
+        - 8002:1433
+    environment:
+        - ACCEPT_EULA=Y
+        - MSSQL_SA_PASSWORD=M@hmood!
+    networks:
+        - bulkybookweb
+
+  bulkybookweb:
+    container_name: bulkybookweb
+    image: ${DOCKER_REGISTRY-}bulkybookweb
+    build:
+      context: .
+      dockerfile: BulkyBookWeb/Dockerfile
+    ports:
+        - 8001:80
+    depends_on:
+        - bulkybookdb
+    environment:
+        - DB_HOST=bulkybookdb
+        - DB_NAME=bulkybookweb
+        - MSSQL_SA_PASSWORD=M@hmood!
+    networks:
+        - bulkybookweb
